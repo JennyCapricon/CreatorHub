@@ -2,6 +2,8 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 
 dotenv.config();
 
@@ -18,6 +20,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../client/dist")));
+}
+
 app.use("/api/auth", authRoutes);
 app.use("/api/captions", captionRoutes);
 app.use("/api/ideas", ideaRoutes);
@@ -30,8 +38,14 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "ok", message: "CreatorHub API is running", mode: global.USE_MEMORY_STORE ? "memory" : "mongodb" });
 });
 
+if (process.env.NODE_ENV === "production") {
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../client/dist/index.html"));
+  });
+}
+
 const PORT = process.env.PORT || 5000;
-const HOST = "0.0.0.0";
+const HOST = process.env.HOST || "0.0.0.0";
 
 mongoose
   .connect(process.env.MONGODB_URI)
