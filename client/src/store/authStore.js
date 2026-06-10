@@ -1,57 +1,73 @@
 import { create } from "zustand";
-import { auth as authApi } from "../utils/api";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+} from "firebase/auth";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { auth, db } from "../firebase/config";
 
-const loadUser = () => {
-  try {
-    const token = localStorage.getItem("token");
-    const savedUser = localStorage.getItem("user");
-    if (token && savedUser) {
-      return { token, user: JSON.parse(savedUser) };
-    }
-  } catch {}
-  return { token: null, user: null };
+const initial = () => {
+  const firebaseUser = auth.currentUser;
+  if (firebaseUser) return { user: { id: firebaseUser.uid, email: firebaseUser.email }, loading: true };
+  return { user: null, loading: true };
 };
 
-const { token: storedToken, user: storedUser } = loadUser();
-
 const useAuthStore = create((set) => ({
-  user: storedUser,
-  token: storedToken,
-  loading: false,
+  ...initial(),
+
+  initAuth: () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    return onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        const snap = await getDoc(doc(db, "users", firebaseUser.uid));
+        const profile = snap.data() || {};
+        set({ user: { id: firebaseUser.uid, email: firebaseUser.email, ...profile }, loading: false });
+      } else {
+        set({ user: null, loading: false });
+      }
+    });
+  },
 
   login: async (email, password) => {
-    const { data } = await authApi.login({ email, password });
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
-    set({ user: data.user, token: data.token });
-    return data;
+    const cred = await signInWithEmailAndPassword(auth, email, password);
+    const snap = await getDoc(doc(db, "users", cred.user.uid));
+    const profile = snap.data() || {};
+    const user = { id: cred.user.uid, email: cred.user.email, ...profile };
+    set({ user });
+    return user;
   },
 
   register: async (email, password, name) => {
-    const { data } = await authApi.register({ email, password, name });
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
-    set({ user: data.user, token: data.token });
-    return data;
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    const profile = {
+      email,
+      name: name || "",
+      username: email.split("@")[0] + Math.floor(Math.random() * 1000),
+      avatar: "",
+      bio: "",
+      plan: "free",
+      linkinbio: { profilePic: "", bio: "", links: [], socialLinks: {}, theme: "dark" },
+      preferences: { darkMode: true, emailNotifications: true },
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    };
+    await setDoc(doc(db, "users", cred.user.uid), profile);
+    const user = { id: cred.user.uid, email: cred.user.email, ...profile };
+    set({ user });
+    return user;
   },
 
-  logout: () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    set({ user: null, token: null });
+  logout: async () => {
+    await signOut(auth);
+    set({ user: null });
   },
 
-  updateUser: (userData) => {
-    localStorage.setItem("user", JSON.stringify(userData));
-    set({ user: userData });
-  },
+  updateUser: (userData) => set({ user: userData }),
 
   setLoading: (loading) => set({ loading }),
-
-  hydrate: () => {
-    const { token, user } = loadUser();
-    set({ user, token, loading: false });
-  },
 }));
 
 export default useAuthStore;

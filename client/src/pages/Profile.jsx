@@ -24,7 +24,7 @@ export default function Profile() {
       updateUser(data.user);
       setMessage("Profile updated successfully!");
     } catch (err) {
-      setMessage(err.response?.data?.message || "Failed to update");
+      setMessage(err.message || "Failed to update");
     } finally {
       setSaving(false);
     }

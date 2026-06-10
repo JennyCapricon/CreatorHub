@@ -41,7 +41,7 @@ export default function Register() {
       await register(email, password, name);
       navigate("/dashboard");
     } catch (err) {
-      setError(err.response?.data?.message || "Registration failed");
+      setError(err.message || "Registration failed");
     } finally {
       setLoading(false);
     }

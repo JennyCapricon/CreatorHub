@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import useAuthStore from "./store/authStore";
 import Layout from "./components/Layout";
@@ -31,6 +32,13 @@ function PublicRoute({ children }) {
 }
 
 export default function App() {
+  const initAuth = useAuthStore((s) => s.initAuth);
+
+  useEffect(() => {
+    const unsub = initAuth();
+    return () => unsub();
+  }, [initAuth]);
+
   return (
     <Routes>
       <Route path="/" element={<PublicRoute><Landing /></PublicRoute>} />
