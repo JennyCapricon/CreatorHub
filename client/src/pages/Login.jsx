@@ -1,8 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Sparkles, Mail, Lock, Eye, EyeOff, LogIn } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
+import useAuthStore from "../store/authStore";
+import { useTheme } from "../context/ThemeContext";
+import {
+  Container, Box, Typography, TextField, Button, Alert,
+  InputAdornment, IconButton, Paper, CircularProgress,
+} from "@mui/material";
+import { Email, Lock, Visibility, VisibilityOff, Login as LoginIcon, LightMode, DarkMode } from "@mui/icons-material";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -10,8 +14,9 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const login = useAuthStore((s) => s.login);
   const navigate = useNavigate();
+  const { darkMode, toggleDarkMode } = useTheme();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,88 +39,146 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md"
+    <Box
+      sx={{
+        minHeight: "100vh",
+        bgcolor: "background.default",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        p: 2,
+        position: "relative",
+      }}
+    >
+      <IconButton
+        onClick={toggleDarkMode}
+        sx={{ position: "absolute", top: 16, right: 16, color: "text.secondary" }}
       >
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center">
-              <Sparkles size={22} className="text-white" />
-            </div>
-            <span className="text-2xl font-bold">
-              <span className="gradient-text">Creator</span>Hub
-            </span>
-          </Link>
-          <h1 className="text-2xl font-bold">Welcome back</h1>
-          <p className="text-gray-400 mt-1">Sign in to your creator workspace</p>
-        </div>
+        {darkMode ? <LightMode /> : <DarkMode />}
+      </IconButton>
+      <Container maxWidth="xs">
+        <Box sx={{ textAlign: "center", mb: 4 }}>
+          <Box
+            component={Link}
+            to="/"
+            sx={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 1,
+              mb: 3,
+              textDecoration: "none",
+            }}
+          >
+            <Box
+              sx={{
+                width: 40,
+                height: 40,
+                borderRadius: "12px",
+                background: "linear-gradient(135deg, #22c55e, #16a34a)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#fff",
+                fontWeight: 700,
+                fontSize: 18,
+              }}
+            >
+              C
+            </Box>
+            <Typography variant="h5" sx={{ fontWeight: 700 }}>
+              <Box component="span" sx={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                Creator
+              </Box>
+              <Box component="span" sx={{ color: "text.primary" }}>
+                Hub
+              </Box>
+            </Typography>
+          </Box>
+          <Typography variant="h4" sx={{ color: "text.primary" }}>
+            Welcome back
+          </Typography>
+          <Typography variant="body2" sx={{ mt: 0.5 }}>
+            Sign in to your creator workspace
+          </Typography>
+        </Box>
 
-        <div className="card p-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
+        <Paper
+          elevation={0}
+          sx={{
+            p: 4,
+            bgcolor: "background.paper",
+            border: "1px solid",
+            borderColor: "divider",
+            borderRadius: 3,
+          }}
+        >
+          <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
             {error && (
-              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+              <Alert severity="error" variant="standard">
                 {error}
-              </div>
+              </Alert>
             )}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
-              <div className="relative">
-                <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="input-field pl-10"
-                  placeholder="you@example.com"
-                />
-              </div>
-            </div>
+            <TextField
+              fullWidth
+              label="Email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Email sx={{ color: "text.secondary", fontSize: 20 }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
-              <div className="relative">
-                <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="input-field pl-10 pr-10"
-                  placeholder="••••••••"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300"
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-            </div>
+            <TextField
+              fullWidth
+              label="Password"
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Lock sx={{ color: "text.secondary", fontSize: 20 }} />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end" sx={{ color: "text.secondary" }}>
+                      {showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
 
-            <button type="submit" disabled={loading} className="btn-primary w-full flex items-center justify-center gap-2">
-              {loading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <>
-                  <LogIn size={18} />
-                  Sign In
-                </>
-              )}
-            </button>
-          </form>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              disabled={loading}
+              startIcon={loading ? <CircularProgress size={18} sx={{ color: "rgba(255,255,255,0.7)" }} /> : <LoginIcon />}
+              sx={{ py: 1.5 }}
+            >
+              {loading ? "Signing in..." : "Sign In"}
+            </Button>
+          </Box>
 
-          <div className="mt-6 text-center text-sm text-gray-500">
+          <Typography variant="body2" sx={{ textAlign: "center", mt: 3 }}>
             Don't have an account?{" "}
-            <Link to="/register" className="text-brand-400 hover:text-brand-300 font-medium">
+            <Link to="/register" style={{ color: "#a78bfa", textDecoration: "none" }}>
               Create one
             </Link>
-          </div>
-        </div>
-      </motion.div>
-    </div>
+          </Typography>
+        </Paper>
+      </Container>
+    </Box>
   );
 }

@@ -15,10 +15,6 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  html {
-    scroll-behavior: smooth;
-  }
-
   ::-webkit-scrollbar {
     width: 6px;
   }
@@ -28,7 +24,7 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #4ade80;
+    background: #22c55e;
     border-radius: 3px;
   }
 }
@@ -37,6 +33,11 @@
   .glass {
     background: rgba(255, 255, 255, 0.03);
     backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .dark .glass {
+    background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.06);
   }
 
@@ -50,19 +51,34 @@
   }
 
   .btn-secondary {
-    @apply glass glass-hover text-white font-medium px-6 py-3 rounded-xl transition-all duration-200;
+    @apply font-medium px-6 py-3 rounded-xl transition-all duration-200;
+    @apply bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200;
+    @apply dark:bg-transparent dark:text-white dark:hover:bg-white/5 dark:border-white/10;
+  }
+
+  .btn-ghost {
+    @apply font-medium p-2 rounded-xl transition-all duration-200;
+    @apply text-gray-500 hover:text-gray-700 hover:bg-gray-100;
+    @apply dark:text-gray-400 dark:hover:text-white dark:hover:bg-white/5;
   }
 
   .input-field {
-    @apply w-full bg-gray-800/50 border border-gray-700/50 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50 transition-all duration-200;
+    @apply w-full rounded-xl px-4 py-3 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50 transition-all duration-200;
+    @apply bg-white border border-gray-300 text-gray-900 placeholder-gray-400;
+    @apply dark:bg-gray-800/50 dark:border-gray-700/50 dark:text-white dark:placeholder-gray-500;
   }
 
   .card {
-    @apply glass rounded-2xl p-6 transition-all duration-200;
+    @apply rounded-2xl p-6 transition-all duration-200;
+    @apply bg-white border border-gray-200 shadow-sm;
+    @apply dark:bg-gray-900/80 dark:border-gray-800/50 dark:shadow-none;
   }
 
   .card-hover {
-    @apply card hover:bg-white/5 hover:border-white/10 cursor-pointer;
+    @apply card;
+    @apply hover:bg-gray-50 hover:border-gray-300;
+    @apply dark:hover:bg-white/5 dark:hover:border-white/10;
+    cursor: pointer;
   }
 
   .gradient-text {
@@ -79,7 +95,7 @@
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(135deg, #4ade80, #22c55e, #16a34a);
+    background: linear-gradient(135deg, #22c55e, #16a34a, #15803d);
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;

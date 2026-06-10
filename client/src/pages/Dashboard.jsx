@@ -5,7 +5,7 @@ import {
   Sparkles, Calendar, BarChart3, TrendingUp, Lightbulb, Link as LinkIcon,
   ArrowRight, Clock, Zap, Target,
 } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
+import useAuthStore from "../store/authStore";
 import { analytics as analyticsApi } from "../utils/api";
 
 const quickActions = [
@@ -23,7 +23,7 @@ const statsCards = [
 ];
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const user = useAuthStore((s) => s.user);
   const [greeting, setGreeting] = useState("");
 
   useEffect(() => {
@@ -39,10 +39,10 @@ export default function Dashboard() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h1 className="text-3xl font-bold">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
           {greeting}, {user?.name || "Creator"} 👋
         </h1>
-        <p className="text-gray-400 mt-1">Here's your creator overview</p>
+        <p className="text-gray-500 dark:text-gray-400 mt-1">Here's your creator overview</p>
       </motion.div>
 
       <motion.div
@@ -76,8 +76,8 @@ export default function Dashboard() {
                 <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${action.color} flex items-center justify-center mb-3`}>
                   <action.icon size={22} className="text-white" />
                 </div>
-                <h3 className="font-semibold mb-1">{action.label}</h3>
-                <p className="text-sm text-gray-500">{action.desc}</p>
+                <h3 className="font-semibold mb-1 text-gray-900 dark:text-white">{action.label}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{action.desc}</p>
                 <ArrowRight size={16} className="text-brand-400 mt-3 opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
             </Link>
@@ -93,8 +93,8 @@ export default function Dashboard() {
       >
         <div className="card">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold">Recent Activity</h3>
-            <Link to="/ideas" className="text-sm text-brand-400 hover:text-brand-300">View all</Link>
+            <h3 className="font-semibold text-gray-900 dark:text-white">Recent Activity</h3>
+            <Link to="/ideas" className="text-sm text-brand-600 dark:text-brand-400 hover:text-brand-500">View all</Link>
           </div>
           <div className="space-y-3">
             {[
@@ -103,8 +103,8 @@ export default function Dashboard() {
               { text: "Added 2 trending sounds", time: "1 day ago" },
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3 text-sm">
-                <div className="w-2 h-2 rounded-full bg-brand-400" />
-                <span className="text-gray-300 flex-1">{item.text}</span>
+                <div className="w-2 h-2 rounded-full bg-brand-500" />
+                <span className="text-gray-600 dark:text-gray-300 flex-1">{item.text}</span>
                 <span className="text-gray-500 text-xs">{item.time}</span>
               </div>
             ))}
@@ -113,8 +113,8 @@ export default function Dashboard() {
 
         <div className="card">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold">Upcoming Posts</h3>
-            <Link to="/planner" className="text-sm text-brand-400 hover:text-brand-300">View all</Link>
+            <h3 className="font-semibold text-gray-900 dark:text-white">Upcoming Posts</h3>
+            <Link to="/planner" className="text-sm text-brand-600 dark:text-brand-400 hover:text-brand-500">View all</Link>
           </div>
           <div className="space-y-3">
             {[
@@ -122,12 +122,12 @@ export default function Dashboard() {
               { title: "GRWM Vlog", platform: "Instagram", date: "Fri, Jun 7" },
               { title: "Productivity Tips", platform: "Both", date: "Mon, Jun 10" },
             ].map((post, i) => (
-              <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/5">
+              <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-white/5">
                 <div>
-                  <p className="text-sm font-medium">{post.title}</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">{post.title}</p>
                   <p className="text-xs text-gray-500">{post.platform}</p>
                 </div>
-                <span className="text-xs text-brand-400">{post.date}</span>
+                <span className="text-xs text-brand-600 dark:text-brand-400">{post.date}</span>
               </div>
             ))}
           </div>
@@ -143,8 +143,8 @@ export default function Dashboard() {
         <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center mx-auto mb-4">
           <Sparkles size={32} className="text-white" />
         </div>
-        <h3 className="text-xl font-bold mb-2">Unlock Premium Features</h3>
-        <p className="text-gray-400 mb-6 max-w-md mx-auto">
+        <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">Unlock Premium Features</h3>
+        <p className="text-gray-500 dark:text-gray-400 mb-6 max-w-md mx-auto">
           Get unlimited AI generations, advanced analytics, trend alerts, and more.
         </p>
         <Link to="/settings" className="btn-primary">

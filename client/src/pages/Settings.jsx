@@ -4,12 +4,13 @@ import {
   Settings as SettingsIcon, Moon, Sun, Bell, Mail, Shield, CreditCard,
   Sparkles, Check,
 } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
+import useAuthStore from "../store/authStore";
 import { useTheme } from "../context/ThemeContext";
 import { auth as authApi } from "../utils/api";
 
 export default function Settings() {
-  const { user, updateUser } = useAuth();
+  const user = useAuthStore((s) => s.user);
+  const updateUser = useAuthStore((s) => s.updateUser);
   const { darkMode, toggleDarkMode } = useTheme();
   const [notifications, setNotifications] = useState(
     user?.preferences?.emailNotifications ?? true
@@ -42,39 +43,39 @@ export default function Settings() {
             <SettingsIcon size={20} className="text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">Settings</h1>
-            <p className="text-sm text-gray-400">Manage your preferences and account</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Settings</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Manage your preferences and account</p>
           </div>
         </div>
       </motion.div>
 
       {message && (
-        <div className="p-3 rounded-xl bg-green-500/10 text-green-400 border border-green-500/20 text-sm">
+        <div className="p-3 rounded-xl bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20 text-sm">
           {message}
         </div>
       )}
 
       <motion.div className="card p-6 space-y-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-        <h3 className="font-semibold flex items-center gap-2">
-          <Sun size={18} className="text-brand-400" />
+        <h3 className="font-semibold flex items-center gap-2 text-gray-900 dark:text-white">
+          <Sun size={18} className="text-brand-500" />
           Appearance
         </h3>
-        <div className="flex items-center justify-between p-4 rounded-xl bg-white/5">
+        <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-white/5">
           <div className="flex items-center gap-3">
-            {darkMode ? <Moon size={20} className="text-purple-400" /> : <Sun size={20} className="text-orange-400" />}
+            {darkMode ? <Moon size={20} className="text-purple-500" /> : <Sun size={20} className="text-orange-500" />}
             <div>
-              <p className="font-medium">Dark Mode</p>
+              <p className="font-medium text-gray-900 dark:text-white">Dark Mode</p>
               <p className="text-sm text-gray-500">{darkMode ? "On" : "Off"}</p>
             </div>
           </div>
           <button
             onClick={toggleDarkMode}
             className={`relative w-12 h-6 rounded-full transition-colors ${
-              darkMode ? "bg-brand-500" : "bg-gray-600"
+              darkMode ? "bg-brand-500" : "bg-gray-300 dark:bg-gray-600"
             }`}
           >
             <div
-              className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${
+              className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform shadow-sm ${
                 darkMode ? "translate-x-6" : "translate-x-0.5"
               }`}
             />
@@ -83,26 +84,26 @@ export default function Settings() {
       </motion.div>
 
       <motion.div className="card p-6 space-y-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-        <h3 className="font-semibold flex items-center gap-2">
-          <Bell size={18} className="text-brand-400" />
+        <h3 className="font-semibold flex items-center gap-2 text-gray-900 dark:text-white">
+          <Bell size={18} className="text-brand-500" />
           Notifications
         </h3>
-        <div className="flex items-center justify-between p-4 rounded-xl bg-white/5">
+        <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-white/5">
           <div className="flex items-center gap-3">
-            <Mail size={20} className="text-blue-400" />
+            <Mail size={20} className="text-blue-500" />
             <div>
-              <p className="font-medium">Email Notifications</p>
+              <p className="font-medium text-gray-900 dark:text-white">Email Notifications</p>
               <p className="text-sm text-gray-500">Receive updates about new features</p>
             </div>
           </div>
           <button
             onClick={() => setNotifications(!notifications)}
             className={`relative w-12 h-6 rounded-full transition-colors ${
-              notifications ? "bg-brand-500" : "bg-gray-600"
+              notifications ? "bg-brand-500" : "bg-gray-300 dark:bg-gray-600"
             }`}
           >
             <div
-              className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${
+              className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform shadow-sm ${
                 notifications ? "translate-x-6" : "translate-x-0.5"
               }`}
             />
@@ -114,23 +115,23 @@ export default function Settings() {
       </motion.div>
 
       <motion.div className="card p-6 space-y-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-        <h3 className="font-semibold flex items-center gap-2">
-          <Shield size={18} className="text-brand-400" />
+        <h3 className="font-semibold flex items-center gap-2 text-gray-900 dark:text-white">
+          <Shield size={18} className="text-brand-500" />
           Plan
         </h3>
         <div className={`p-6 rounded-xl border ${
-          user?.plan === "premium" ? "bg-brand-500/10 border-brand-500/30" : "bg-white/5 border-white/10"
+          user?.plan === "premium" ? "bg-brand-500/10 border-brand-500/30" : "bg-gray-50 dark:bg-white/5 border-gray-200 dark:border-white/10"
         }`}>
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="font-semibold text-lg capitalize">{user?.plan || "Free"} Plan</p>
-              <p className="text-sm text-gray-400">
+              <p className="font-semibold text-lg capitalize text-gray-900 dark:text-white">{user?.plan || "Free"} Plan</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 {user?.plan === "premium" ? "You have access to all features" : "Upgrade for unlimited access"}
               </p>
             </div>
             {user?.plan === "premium" && (
               <div className="w-10 h-10 rounded-full bg-brand-500/20 flex items-center justify-center">
-                <Check size={20} className="text-brand-400" />
+                <Check size={20} className="text-brand-600 dark:text-brand-400" />
               </div>
             )}
           </div>
@@ -144,8 +145,8 @@ export default function Settings() {
               { feature: "Idea Storage", free: "50", premium: "Unlimited" },
             ].map((item) => (
               <div key={item.feature} className="flex items-center justify-between text-sm">
-                <span className="text-gray-400">{item.feature}</span>
-                <span className={user?.plan === "premium" ? "text-brand-400" : "text-gray-500"}>
+                <span className="text-gray-500 dark:text-gray-400">{item.feature}</span>
+                <span className={user?.plan === "premium" ? "text-brand-600 dark:text-brand-400" : "text-gray-500"}>
                   {item.premium === true ? "✓" : item.premium === false ? "—" : `Free: ${item.free} | Premium: ${item.premium}`}
                 </span>
               </div>
@@ -162,18 +163,18 @@ export default function Settings() {
       </motion.div>
 
       <motion.div className="card p-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
-        <h3 className="font-semibold flex items-center gap-2 mb-4">
-          <CreditCard size={18} className="text-brand-400" />
+        <h3 className="font-semibold flex items-center gap-2 mb-4 text-gray-900 dark:text-white">
+          <CreditCard size={18} className="text-brand-500" />
           Account
         </h3>
         <div className="space-y-3 text-sm">
-          <div className="flex justify-between p-3 rounded-xl bg-white/5">
-            <span className="text-gray-400">Email</span>
-            <span>{user?.email}</span>
+          <div className="flex justify-between p-3 rounded-xl bg-gray-50 dark:bg-white/5">
+            <span className="text-gray-500 dark:text-gray-400">Email</span>
+            <span className="text-gray-900 dark:text-white">{user?.email}</span>
           </div>
-          <div className="flex justify-between p-3 rounded-xl bg-white/5">
-            <span className="text-gray-400">Member Since</span>
-            <span>{user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : "—"}</span>
+          <div className="flex justify-between p-3 rounded-xl bg-gray-50 dark:bg-white/5">
+            <span className="text-gray-500 dark:text-gray-400">Member Since</span>
+            <span className="text-gray-900 dark:text-white">{user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : "—"}</span>
           </div>
         </div>
       </motion.div>

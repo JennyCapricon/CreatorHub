@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useAuth } from "./context/AuthContext";
+import useAuthStore from "./store/authStore";
 import Layout from "./components/Layout";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
@@ -15,14 +15,16 @@ import Settings from "./pages/Settings";
 import LinkInBio from "./pages/LinkInBio";
 
 function ProtectedRoute({ children }) {
-  const { user, loading } = useAuth();
+  const user = useAuthStore((s) => s.user);
+  const loading = useAuthStore((s) => s.loading);
   if (loading) return null;
   if (!user) return <Navigate to="/login" />;
   return children;
 }
 
 function PublicRoute({ children }) {
-  const { user, loading } = useAuth();
+  const user = useAuthStore((s) => s.user);
+  const loading = useAuthStore((s) => s.loading);
   if (loading) return null;
   if (user) return <Navigate to="/dashboard" />;
   return children;
