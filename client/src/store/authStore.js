@@ -3,6 +3,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
+  sendPasswordResetEmail,
   onAuthStateChanged,
 } from "firebase/auth";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
@@ -20,15 +21,36 @@ const useAuthStore = create((set) => ({
   initAuth: () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    return onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        const snap = await getDoc(doc(db, "users", firebaseUser.uid));
-        const profile = snap.data() || {};
-        set({ user: { id: firebaseUser.uid, email: firebaseUser.email, ...profile }, loading: false });
-      } else {
-        set({ user: null, loading: false });
+    let settled = false;
+    const failSafe = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      set({ loading: false });
+    }, 8000);
+    const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(failSafe);
+      try {
+        if (firebaseUser) {
+          const snap = await getDoc(doc(db, "users", firebaseUser.uid));
+          const profile = snap.data() || {};
+          set({ user: { id: firebaseUser.uid, email: firebaseUser.email, ...profile }, loading: false });
+        } else {
+          set({ user: null, loading: false });
+        }
+      } catch {
+        if (firebaseUser) {
+          set({ user: { id: firebaseUser.uid, email: firebaseUser.email }, loading: false });
+        } else {
+          set({ user: null, loading: false });
+        }
       }
     });
+    return () => {
+      clearTimeout(failSafe);
+      unsub();
+    };
   },
 
   login: async (email, password) => {
@@ -63,6 +85,10 @@ const useAuthStore = create((set) => ({
   logout: async () => {
     await signOut(auth);
     set({ user: null });
+  },
+
+  resetPassword: async (email) => {
+    await sendPasswordResetEmail(auth, email);
   },
 
   updateUser: (userData) => set({ user: userData }),
