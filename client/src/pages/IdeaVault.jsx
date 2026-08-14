@@ -88,17 +88,17 @@ export default function IdeaVault() {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center shrink-0">
               <Lightbulb size={20} className="text-white" />
             </div>
-            <div>
+            <div className="min-w-0">
               <h1 className="text-2xl font-bold">Idea Vault</h1>
               <p className="text-sm text-gray-400">Never lose a content idea again</p>
             </div>
           </div>
-          <button onClick={() => { setEditing(null); setForm({ title: "", description: "", type: "video", tags: "" }); setShowModal(true); }} className="btn-primary text-sm !py-2 !px-4 flex items-center gap-2">
+          <button onClick={() => { setEditing(null); setForm({ title: "", description: "", type: "video", tags: "" }); setShowModal(true); }} className="btn-primary text-sm !py-2 !px-4 flex items-center gap-2 shrink-0">
             <Plus size={16} />
             New Idea
           </button>
@@ -166,15 +166,15 @@ export default function IdeaVault() {
                 transition={{ delay: i * 0.03 }}
               >
                 <div className="flex items-start gap-4">
-                  <div className={`w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center ${iconColor}`}>
+                  <div className={`w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center ${iconColor} shrink-0`}>
                     <TypeIcon size={20} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <h3 className="font-medium">{idea.title}</h3>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <h3 className="font-medium break-words">{idea.title}</h3>
                         {idea.description && (
-                          <p className="text-sm text-gray-400 mt-1 line-clamp-2">{idea.description}</p>
+                          <p className="text-sm text-gray-400 mt-1 line-clamp-2 break-words">{idea.description}</p>
                         )}
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
@@ -218,7 +218,7 @@ export default function IdeaVault() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60"
+            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-3 sm:p-4 bg-black/60 overflow-y-auto"
             onClick={() => setShowModal(false)}
           >
             <motion.div
@@ -226,7 +226,7 @@ export default function IdeaVault() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-lg card p-6"
+              className="w-full max-w-lg card max-h-[90vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-semibold">{editing ? "Edit Idea" : "New Idea"}</h3>

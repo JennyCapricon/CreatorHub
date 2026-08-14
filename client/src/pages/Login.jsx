@@ -105,7 +105,7 @@ export default function Login() {
         <Paper
           elevation={0}
           sx={{
-            p: 4,
+            p: { xs: 3, sm: 4 },
             bgcolor: "background.paper",
             border: "1px solid",
             borderColor: "divider",

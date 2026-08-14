@@ -112,12 +112,12 @@ export default function AnalyticsPage() {
   return (
     <div className="space-y-8">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center shrink-0">
               <BarChart3 size={20} className="text-white" />
             </div>
-            <div>
+            <div className="min-w-0">
               <h1 className="text-2xl font-bold">Analytics</h1>
               <p className="text-sm text-gray-400">Track your growth and engagement</p>
             </div>
@@ -127,7 +127,7 @@ export default function AnalyticsPage() {
               <button
                 key={p}
                 onClick={() => setPeriod(p)}
-                className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
+                className={`px-3 py-1.5 rounded-lg text-sm transition-all shrink-0 ${
                   period === p
                     ? "bg-brand-500/20 text-brand-400 border border-brand-500/30"
                     : "text-gray-400 hover:text-white border border-transparent"
@@ -181,7 +181,7 @@ export default function AnalyticsPage() {
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
-                  <XAxis dataKey="date" stroke="#6b7280" fontSize={12} />
+                  <XAxis dataKey="date" stroke="#6b7280" fontSize={12} minTickGap={24} />
                   <YAxis stroke="#6b7280" fontSize={12} />
                   <Tooltip content={<CustomTooltip />} />
                   <Area
@@ -206,7 +206,7 @@ export default function AnalyticsPage() {
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={data}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
-                  <XAxis dataKey="date" stroke="#6b7280" fontSize={12} />
+                  <XAxis dataKey="date" stroke="#6b7280" fontSize={12} minTickGap={24} />
                   <YAxis stroke="#6b7280" fontSize={12} />
                   <Tooltip content={<CustomTooltip />} />
                   <Bar dataKey="likes" fill="#4ade80" radius={[4, 4, 0, 0]} />
@@ -230,7 +230,7 @@ export default function AnalyticsPage() {
                     data={generatePieData()}
                     cx="50%"
                     cy="50%"
-                    outerRadius={100}
+                    outerRadius="80%"
                     dataKey="value"
                     label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                   >
@@ -253,7 +253,7 @@ export default function AnalyticsPage() {
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={generateBestTimes()}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
-                  <XAxis dataKey="time" stroke="#6b7280" fontSize={12} />
+                  <XAxis dataKey="time" stroke="#6b7280" fontSize={12} minTickGap={16} />
                   <YAxis stroke="#6b7280" fontSize={12} unit="%" />
                   <Tooltip content={<CustomTooltip />} />
                   <Line

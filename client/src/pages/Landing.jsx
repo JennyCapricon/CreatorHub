@@ -84,23 +84,23 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950 transition-colors duration-300 overflow-x-hidden">
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-gray-200 dark:border-gray-800/50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl transition-colors duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2 shrink-0">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center">
               <Sparkles size={18} className="text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900 dark:text-white">
+            <span className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white whitespace-nowrap">
               <span className="gradient-text">Creator</span>Hub
             </span>
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button onClick={toggleDarkMode} className="btn-ghost" aria-label="Toggle theme">
               {darkMode ? <Sun size={18} /> : <Moon size={18} />}
             </button>
-            <Link to="/login" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+            <Link to="/login" className="hidden sm:block text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
               Sign In
             </Link>
-            <Link to="/register" className="btn-primary text-sm !py-2.5">
+            <Link to="/register" className="btn-primary text-sm !py-2.5 !px-4 sm:!px-6">
               Get Started Free
             </Link>
           </div>
@@ -164,7 +164,7 @@ export default function Landing() {
           </motion.div>
           <motion.h1
             variants={fadeUp}
-            className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6 leading-[1.1] text-gray-900 dark:text-white drop-shadow-sm"
+            className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6 leading-[1.1] text-gray-900 dark:text-white drop-shadow-sm"
           >
             Create. Plan.<br />
             <span className="gradient-text">Grow</span> Your Content
@@ -185,7 +185,7 @@ export default function Landing() {
               See Features
             </a>
           </motion.div>
-          <motion.div variants={fadeUp} className="mt-12 flex items-center justify-center gap-8 text-sm text-gray-500 dark:text-gray-400">
+          <motion.div variants={fadeUp} className="mt-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm text-gray-500 dark:text-gray-400">
             <div className="flex items-center gap-2">
               <Shield size={16} className="text-brand-500 dark:text-brand-400" />
               No credit card

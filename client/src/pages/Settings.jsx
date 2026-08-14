@@ -144,9 +144,9 @@ export default function Settings() {
               { feature: "Trend Alerts", free: false, premium: true },
               { feature: "Idea Storage", free: "50", premium: "Unlimited" },
             ].map((item) => (
-              <div key={item.feature} className="flex items-center justify-between text-sm">
+              <div key={item.feature} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-sm">
                 <span className="text-gray-500 dark:text-gray-400">{item.feature}</span>
-                <span className={user?.plan === "premium" ? "text-brand-600 dark:text-brand-400" : "text-gray-500"}>
+                <span className={`sm:text-right break-words ${user?.plan === "premium" ? "text-brand-600 dark:text-brand-400" : "text-gray-500"}`}>
                   {item.premium === true ? "✓" : item.premium === false ? "—" : `Free: ${item.free} | Premium: ${item.premium}`}
                 </span>
               </div>
@@ -168,13 +168,13 @@ export default function Settings() {
           Account
         </h3>
         <div className="space-y-3 text-sm">
-          <div className="flex justify-between p-3 rounded-xl bg-gray-50 dark:bg-white/5">
-            <span className="text-gray-500 dark:text-gray-400">Email</span>
-            <span className="text-gray-900 dark:text-white">{user?.email}</span>
+          <div className="flex justify-between gap-3 p-3 rounded-xl bg-gray-50 dark:bg-white/5">
+            <span className="text-gray-500 dark:text-gray-400 shrink-0">Email</span>
+            <span className="text-gray-900 dark:text-white text-right break-all">{user?.email}</span>
           </div>
-          <div className="flex justify-between p-3 rounded-xl bg-gray-50 dark:bg-white/5">
-            <span className="text-gray-500 dark:text-gray-400">Member Since</span>
-            <span className="text-gray-900 dark:text-white">{user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : "—"}</span>
+          <div className="flex justify-between gap-3 p-3 rounded-xl bg-gray-50 dark:bg-white/5">
+            <span className="text-gray-500 dark:text-gray-400 shrink-0">Member Since</span>
+            <span className="text-gray-900 dark:text-white text-right">{user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : "—"}</span>
           </div>
         </div>
       </motion.div>

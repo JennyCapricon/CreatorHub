@@ -3,45 +3,10 @@ import {
   query, where, orderBy, limit, serverTimestamp,
 } from "firebase/firestore";
 import { db, auth as firebaseAuth } from "../firebase/config";
+import { generateContent } from "./contentEngine";
 
 const uid = () => firebaseAuth.currentUser?.uid;
 const userCol = (name) => (uid() ? collection(db, "users", uid(), name) : null);
-
-const moods = {
-  funny: ["Laughing at how real this is", "Not me actually ", "I'm not crying, you're crying"],
-  inspirational: ["Your sign to ", "Stop waiting. Start doing.", "The glow up starts now"],
-  aesthetic: ["A vibe that hits different", "POV: you found your aesthetic", "Soft era loading"],
-  educational: ["Save this for later ", "Here's what nobody tells you", "The truth about "],
-  relatable: ["We all do this and it's okay", "That awkward moment when", "Nobody:                        Me:"],
-};
-
-function generateCaptions(topic, mood, audience) {
-  const moodCaptions = moods[mood?.toLowerCase()] || moods.relatable;
-  return {
-    captions: [
-      `${moodCaptions[0]} ${topic}${mood === "funny" ? " 😭" : ""}`,
-      `${moodCaptions[1]} ${topic} ✨`,
-      `${moodCaptions[2]} ${topic} 👏`,
-      `Saving this if you're a ${audience || "creator"} who needs to hear this: ${topic}`,
-      `${topic} is the new era and we're here for it 🔥`,
-    ],
-    hooks: [
-      `STOP SCROLLING if you ${topic}`,
-      `The truth about ${topic} nobody talks about`,
-      `${topic} changed my life`,
-    ],
-    povLines: [
-      `POV: you finally ${topic.toLowerCase()}`,
-      `POV: ${audience || "creators"} when ${topic}`,
-      `POV: the ${topic} era begins now`,
-    ],
-    hashtags: [
-      `#${topic.replace(/\s+/g, "")}`,
-      `#${topic.replace(/\s+/g, "")}Tok`,
-      "#creatorhub", "#contentcreator", "#growyourpage", "#viral", "#fyp",
-    ],
-  };
-}
 
 export const auth = {
   getMe: async () => {
@@ -64,12 +29,22 @@ export const auth = {
 
 export const captions = {
   generate: async (body) => {
-    const { topic, mood, audience } = body;
-    if (!topic) throw new Error("Topic is required");
-    const result = generateCaptions(topic, mood, audience);
+    const {
+      topic = "", niche = "", platform = "instagram", contentType = "auto",
+      tone = "casual", audience = "everyone", count = 1, goal = "", experienceLevel = "",
+    } = body;
+    const result = generateContent({ topic, niche, platform, contentType, tone, audience, count, goal, experienceLevel });
     const ref = await addDoc(userCol("captions"), {
-      topic, mood: mood || "", audience: audience || "",
-      ...result, saved: false,
+      topic: topic || "",
+      niche: niche || "",
+      platform,
+      contentType: contentType || "auto",
+      tone: tone || "casual",
+      audience: audience || "everyone",
+      count: result.count,
+      posts: result.posts,
+      hashtags: result.hashtags,
+      saved: false,
       createdAt: serverTimestamp(),
     });
     return { data: { ...result, _id: ref.id } };

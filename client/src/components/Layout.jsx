@@ -121,8 +121,8 @@ export default function Layout() {
         </div>
       </aside>
 
-      <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
-        <div className="p-4 lg:p-8 max-w-7xl mx-auto">
+      <main className="flex-1 min-w-0 overflow-y-auto bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
+        <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full min-w-0">
           <Outlet />
         </div>
       </main>

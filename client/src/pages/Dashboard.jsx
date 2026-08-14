@@ -39,7 +39,7 @@ export default function Dashboard() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
           {greeting}, {user?.name || "Creator"} 👋
         </h1>
         <p className="text-gray-500 dark:text-gray-400 mt-1">Here's your creator overview</p>
@@ -135,7 +135,7 @@ export default function Dashboard() {
       </motion.div>
 
       <motion.div
-        className="card gradient-border p-8 text-center"
+        className="card gradient-border p-6 sm:p-8 text-center"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}

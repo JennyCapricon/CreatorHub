@@ -57,17 +57,17 @@ export default function TrendTracker() {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center shrink-0">
               <TrendingUp size={20} className="text-white" />
             </div>
-            <div>
+            <div className="min-w-0">
               <h1 className="text-2xl font-bold">Trend Tracker</h1>
               <p className="text-sm text-gray-400">Save and organize trending sounds and formats</p>
             </div>
           </div>
-          <button onClick={() => setShowModal(true)} className="btn-primary text-sm !py-2 !px-4 flex items-center gap-2">
+          <button onClick={() => setShowModal(true)} className="btn-primary text-sm !py-2 !px-4 flex items-center gap-2 shrink-0">
             <Plus size={16} />
             Add Trend
           </button>
@@ -158,7 +158,7 @@ export default function TrendTracker() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60"
+            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-3 sm:p-4 bg-black/60 overflow-y-auto"
             onClick={() => setShowModal(false)}
           >
             <motion.div
@@ -166,7 +166,7 @@ export default function TrendTracker() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md card p-6"
+              className="w-full max-w-md card max-h-[90vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-semibold">Add Trend</h3>

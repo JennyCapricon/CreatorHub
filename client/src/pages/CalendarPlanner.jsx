@@ -99,13 +99,13 @@ export default function CalendarPlanner() {
             key={day.toISOString()}
             onClick={() => openModal(day)}
             className={`
-              relative p-2 h-24 text-left transition-all duration-200 rounded-xl border
+              relative p-1.5 sm:p-2 h-20 sm:h-24 text-left transition-all duration-200 rounded-xl border min-w-0
               ${!isSameMonth(day, monthStart) ? "opacity-30" : ""}
               ${isToday(day) ? "border-brand-500/50 bg-brand-500/5" : "border-transparent hover:bg-white/5"}
             `}
           >
             <span
-              className={`text-sm ${
+              className={`text-xs sm:text-sm ${
                 isToday(day) ? "text-brand-400 font-bold" : "text-gray-400"
               }`}
             >
@@ -167,13 +167,13 @@ export default function CalendarPlanner() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
       >
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
           <div className="flex items-center gap-4">
-            <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="p-2 hover:bg-white/5 rounded-xl transition-colors">
+            <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))} className="p-2 hover:bg-white/5 rounded-xl transition-colors shrink-0" aria-label="Previous month">
               <ChevronLeft size={20} />
             </button>
-            <h2 className="text-xl font-semibold">{format(currentMonth, "MMMM yyyy")}</h2>
-            <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} className="p-2 hover:bg-white/5 rounded-xl transition-colors">
+            <h2 className="text-lg sm:text-xl font-semibold whitespace-nowrap">{format(currentMonth, "MMMM yyyy")}</h2>
+            <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))} className="p-2 hover:bg-white/5 rounded-xl transition-colors shrink-0" aria-label="Next month">
               <ChevronRight size={20} />
             </button>
           </div>
@@ -188,7 +188,7 @@ export default function CalendarPlanner() {
 
         <div className="grid grid-cols-7 gap-1 mb-2">
           {dayNames.map((name) => (
-            <div key={name} className="text-center text-xs text-gray-500 font-medium py-2">
+            <div key={name} className="text-center text-[11px] sm:text-xs text-gray-500 font-medium py-2">
               {name}
             </div>
           ))}
@@ -203,7 +203,7 @@ export default function CalendarPlanner() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60"
+            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-3 sm:p-4 bg-black/60 overflow-y-auto"
             onClick={() => setShowModal(false)}
           >
             <motion.div
@@ -211,7 +211,7 @@ export default function CalendarPlanner() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md card p-6"
+              className="w-full max-w-md card max-h-[90vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-semibold">

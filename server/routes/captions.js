@@ -2,61 +2,39 @@ import express from "express";
 import Caption from "../models/Caption.js";
 import store from "../store.js";
 import { protect } from "../middleware/auth.js";
+import { generateContent } from "../utils/contentEngine.js";
 
 const router = express.Router();
 
-const moods = {
-  funny: ["Laughing at how real this is", "Not me actually ", "I'm not crying, you're crying"],
-  inspirational: ["Your sign to ", "Stop waiting. Start doing.", "The glow up starts now"],
-  aesthetic: ["A vibe that hits different", "POV: you found your aesthetic", "Soft era loading"],
-  educational: ["Save this for later ", "Here's what nobody tells you", "The truth about "],
-  relatable: ["We all do this and it's okay", "That awkward moment when", "Nobody:                        Me:"],
-};
-
-const generateCaptions = (topic, mood, audience) => {
-  const moodCaptions = moods[mood?.toLowerCase()] || moods.relatable;
-  return {
-    captions: [
-      `${moodCaptions[0]} ${topic}${mood === "funny" ? " 😭" : ""}`,
-      `${moodCaptions[1]} ${topic} ✨`,
-      `${moodCaptions[2]} ${topic} 👏`,
-      `Saving this if you're a ${audience || "creator"} who needs to hear this: ${topic}`,
-      `${topic} is the new era and we're here for it 🔥`,
-    ],
-    hooks: [
-      `STOP SCROLLING if you ${topic}`,
-      `The truth about ${topic} nobody talks about`,
-      `${topic} changed my life`,
-    ],
-    povLines: [
-      `POV: you finally ${topic.toLowerCase()}`,
-      `POV: ${audience || "creators"} when ${topic}`,
-      `POV: the ${topic} era begins now`,
-    ],
-    hashtags: [
-      `#${topic.replace(/\s+/g, "")}`,
-      `#${topic.replace(/\s+/g, "")}Tok`,
-      "#creatorhub", "#contentcreator", "#growyourpage", "#viral", "#fyp",
-    ],
-  };
-};
-
 router.post("/generate", protect, async (req, res) => {
   try {
-    const { topic, mood, audience } = req.body;
-    if (!topic) return res.status(400).json({ message: "Topic is required" });
+    const {
+      topic = "", niche = "", platform = "instagram", contentType = "auto",
+      tone = "casual", audience = "everyone", count = 1, goal = "", experienceLevel = "",
+    } = req.body;
 
-    const { captions, hooks, povLines, hashtags } = generateCaptions(topic, mood, audience);
-    const doc = { userId: req.user._id, topic, mood: mood || "", audience: audience || "", captions, hooks, povLines, hashtags };
+    const result = generateContent({ topic, niche, platform, contentType, tone, audience, count, goal, experienceLevel });
+    const doc = {
+      userId: req.user._id,
+      topic: topic || "",
+      niche: niche || "",
+      platform,
+      contentType: contentType || "auto",
+      tone: tone || "casual",
+      audience: audience || "everyone",
+      count: result.count,
+      posts: result.posts,
+      hashtags: result.hashtags,
+    };
 
-    let result;
+    let resultDoc;
     if (global.USE_MEMORY_STORE) {
-      result = store.createCaption(doc);
+      resultDoc = store.createCaption(doc);
     } else {
-      result = await Caption.create(doc);
+      resultDoc = await Caption.create(doc);
     }
 
-    res.status(201).json(result);
+    res.status(201).json({ ...result, _id: resultDoc._id });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

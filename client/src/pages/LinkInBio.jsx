@@ -92,7 +92,7 @@ function AdminPanel() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Social Links</label>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
               { key: "instagram", icon: Instagram, label: "Instagram" },
               { key: "tiktok", icon: Music2, label: "TikTok" },
@@ -121,19 +121,19 @@ function AdminPanel() {
           <div className="space-y-2 mb-4">
             {data.links.map((link) => (
               <div key={link.id} className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 dark:bg-white/5">
-                <LinkIcon size={16} className="text-gray-500" />
-                <span className="flex-1 text-sm truncate text-gray-900 dark:text-white">{link.title}</span>
-                <span className="text-xs text-gray-500 truncate max-w-[150px]">{link.url}</span>
-                <button onClick={() => removeLink(link.id)} className="p-1 hover:bg-red-500/10 rounded-lg">
+                <LinkIcon size={16} className="text-gray-500 shrink-0" />
+                <span className="flex-1 min-w-0 text-sm truncate text-gray-900 dark:text-white">{link.title}</span>
+                <span className="hidden sm:block text-xs text-gray-500 truncate max-w-[150px]">{link.url}</span>
+                <button onClick={() => removeLink(link.id)} className="p-1 hover:bg-red-500/10 rounded-lg shrink-0">
                   <X size={14} className="text-gray-500 hover:text-red-400" />
                 </button>
               </div>
             ))}
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <input type="text" value={newLink.title} onChange={(e) => setNewLink({ ...newLink, title: e.target.value })} className="input-field flex-1" placeholder="Link title" />
             <input type="url" value={newLink.url} onChange={(e) => setNewLink({ ...newLink, url: e.target.value })} className="input-field flex-1" placeholder="https://..." />
-            <button onClick={addLink} className="btn-primary !px-4">
+            <button onClick={addLink} className="btn-primary !px-4 shrink-0">
               <Plus size={18} />
             </button>
           </div>
