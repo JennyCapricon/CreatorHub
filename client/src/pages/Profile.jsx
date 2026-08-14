@@ -6,7 +6,6 @@ import { auth as authApi } from "../utils/api";
 import {
   validateAvatarFile,
   uploadAvatar,
-  removeStoredAvatar,
   AVATAR_TYPES,
   AVATAR_MAX_MB,
 } from "../utils/upload";
@@ -70,7 +69,7 @@ export default function Profile() {
       const { data } = await authApi.updateProfile({ ...form, avatar: avatarUrl });
       updateUser(data.user);
       if (selectedFile) {
-        removeStoredAvatar(form.avatar);
+        setForm({ ...form, avatar: avatarUrl });
         setSelectedFile(null);
         if (previewUrl) URL.revokeObjectURL(previewUrl);
         setPreviewUrl("");
@@ -85,7 +84,7 @@ export default function Profile() {
     }
   };
 
-  const avatarSrc = previewUrl || form.avatar || "";
+  const avatarSrc = previewUrl || form.avatar || user?.avatar || "";
   const uploading = saving && selectedFile;
 
   return (

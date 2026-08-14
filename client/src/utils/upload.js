@@ -1,30 +1,12 @@
-import {
-  ref as storageRef,
-  uploadBytesResumable,
-  getDownloadURL,
-  deleteObject,
-} from "firebase/storage";
-import { storage, auth } from "../firebase/config";
+import { auth } from "../firebase/config";
 
 export const AVATAR_TYPES = ["image/jpeg", "image/png", "image/webp"];
 export const AVATAR_MAX_MB = 5;
 
-const friendlyError = (err, fallback) => {
-  switch (err?.code) {
-    case "storage/unauthorized":
-      return "You don't have permission to upload a profile picture. Please sign in and try again.";
-    case "storage/quota-exceeded":
-      return "Storage quota exceeded. Please try again later.";
-    case "storage/retry-limit-exceeded":
-    case "storage/network-error":
-    case "storage/network-invalid-response":
-      return "Network error. Check your connection and try again.";
-    case "storage/invalid-argument":
-      return "The image could not be uploaded. Please try a different file.";
-    default:
-      return fallback || "Upload failed. Please try again.";
-  }
-};
+const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+
+let uploadInFlight = false;
 
 export const validateAvatarFile = (file) => {
   if (!file) return "No file selected.";
@@ -37,43 +19,76 @@ export const validateAvatarFile = (file) => {
   return null;
 };
 
-export const removeStoredAvatar = async (url) => {
-  if (!url || !url.includes("firebasestorage.googleapis.com")) return;
-  try {
-    await deleteObject(storageRef(storage, url));
-  } catch {
-    // old file may already be gone; never block the profile update on cleanup
+const friendlyError = (cloudinaryMessage) => {
+  if (!cloudinaryMessage) return "Upload failed. Please try again.";
+  const msg = cloudinaryMessage.toLowerCase();
+  if (msg.includes("too large")) return `The image is too large. Maximum size is ${AVATAR_MAX_MB} MB.`;
+  if (msg.includes("format")) return "Unsupported file type. Please choose a JPG, JPEG, PNG, or WebP image.";
+  if (msg.includes("not authorised") || msg.includes("unauthor") || msg.includes("permission")) {
+    return "Upload not permitted. Check that the upload preset is configured as unsigned.";
   }
+  return "Upload failed. Please try again.";
 };
 
-export const uploadAvatar = async (file, onProgress) => {
-  const validationError = validateAvatarFile(file);
-  if (validationError) throw new Error(validationError);
+export const uploadAvatar = (file, onProgress) => {
+  return new Promise((resolve, reject) => {
+    const validationError = validateAvatarFile(file);
+    if (validationError) return reject(new Error(validationError));
 
-  const user = auth.currentUser;
-  if (!user) throw new Error("You must be signed in to upload a profile picture.");
+    if (uploadInFlight) {
+      return reject(new Error("An upload is already in progress. Please wait."));
+    }
+    if (!CLOUD_NAME || !UPLOAD_PRESET) {
+      return reject(new Error("Profile picture uploads are not configured. Please try again later."));
+    }
 
-  const safeName = (file.name || "avatar")
-    .replace(/[^a-zA-Z0-9._-]/g, "-")
-    .slice(-50);
-  const ref = storageRef(storage, `avatars/${user.uid}/${Date.now()}-${safeName}`);
+    const user = auth.currentUser;
+    if (!user) return reject(new Error("You must be signed in to upload a profile picture."));
 
-  try {
-    const task = uploadBytesResumable(ref, file, { contentType: file.type });
-    const snapshot = await new Promise((resolve, reject) => {
-      task.on(
-        "state_changed",
-        (snap) => {
-          if (onProgress && snap.totalBytes > 0) {
-            onProgress(Math.round((snap.bytesTransferred / snap.totalBytes) * 100));
-          }
-        },
-        reject,
-        resolve
-      );
-    });
-    return await getDownloadURL(snapshot.ref);
-  } catch (err) {
-    throw new Error(friendlyError(err));
-  }
+    const uid = user.uid;
+
+    // Fixed public id per user under the preset-locked folder (creator-hub/avatars),
+    // with overwrite=true so re-uploading REPLACES the same asset (no duplicates).
+    const form = new FormData();
+    form.append("file", file);
+    form.append("upload_preset", UPLOAD_PRESET);
+    form.append("public_id", `${uid}/avatar`);
+    form.append("overwrite", "true");
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`);
+    xhr.responseType = "json";
+
+    if (onProgress && xhr.upload) {
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable && e.total > 0) {
+          onProgress(Math.round((e.loaded / e.total) * 100));
+        }
+      };
+    }
+
+    xhr.onload = () => {
+      uploadInFlight = false;
+      const json = xhr.response;
+      if (xhr.status >= 200 && xhr.status < 300 && json && json.secure_url) {
+        resolve(json.secure_url);
+      } else if (json && json.error && json.error.message) {
+        reject(new Error(friendlyError(json.error.message)));
+      } else {
+        reject(new Error("Upload failed. Please try again."));
+      }
+    };
+
+    xhr.onerror = () => {
+      uploadInFlight = false;
+      reject(new Error("Network error. Check your connection and try again."));
+    };
+    xhr.onabort = () => {
+      uploadInFlight = false;
+      reject(new Error("Upload was cancelled."));
+    };
+
+    uploadInFlight = true;
+    xhr.send(form);
+  });
 };

@@ -1,0 +1,40 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ============ users/{uid} — the user's profile document ============
+    // Used by: register (create), auth init, profile/settings/link-in-bio reads,
+    // profile updates (name, username, bio, avatar URL, preferences, linkinbio object).
+    match /users/{userId} {
+
+      // Public read — REQUIRED for the public link-in-bio page:
+      // /link/:username runs an unauthenticated query on users by username.
+      allow read: if true;
+
+      // Only the signed-in user may create their own profile document
+      // (register writes to users/<their-own-uid>).
+      allow create: if request.auth != null && request.auth.uid == userId;
+
+      // Only the owner may update it. This covers saving the profile
+      // including the avatar URL and the linkinbio object.
+      allow update: if request.auth != null && request.auth.uid == userId;
+
+      // The app never deletes profiles.
+      allow delete: if false;
+    }
+
+    // ============ users/{uid}/<subcollection> — user-owned content ============
+    // Covers: captions, ideas, posts (planner), trends, analytics.
+    // Every subcollection is created/read/updated/deleted only through
+    // userCol(name) = collection(db, "users", currentUser.uid, name),
+    // i.e. always scoped to the authenticated user's own uid.
+    // Only the owner can access their own data; no other user — and no
+    // unauthenticated client — can read or write these.
+    match /users/{userId}/{subcollection}/{docId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && request.auth.uid == userId;
+      allow delete: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
