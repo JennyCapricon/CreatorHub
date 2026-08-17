@@ -11,12 +11,34 @@ import {
   PersonAdd, LightMode, DarkMode,
 } from "@mui/icons-material";
 
+const getRegisterError = (err) => {
+  const code = err?.code || "";
+  switch (code) {
+    case "auth/email-already-in-use":
+      return { code, message: "An account with this email already exists. Sign in instead, or use \"Forgot password?\" on the Sign In page to reset your password." };
+    case "auth/weak-password":
+      return { message: "Password is too weak. Use at least 6 characters, mixing letters, numbers, and symbols." };
+    case "auth/invalid-email":
+    case "auth/missing-email":
+      return { message: "Please enter a valid email address." };
+    case "auth/network-request-failed":
+      return { message: "Network error. Check your connection and try again." };
+    case "auth/too-many-requests":
+      return { message: "Too many attempts. Please wait a moment and try again." };
+    case "auth/operation-not-allowed":
+      return { message: "Email/password sign up is currently disabled. Please contact support." };
+    default:
+      return { message: "Registration failed. Please try again." };
+  }
+};
+
 export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [alreadyExists, setAlreadyExists] = useState(false);
   const [loading, setLoading] = useState(false);
   const register = useAuthStore((s) => s.register);
   const navigate = useNavigate();
@@ -25,6 +47,7 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setAlreadyExists(false);
 
     if (!email || !password) {
       setError("Please fill in all fields");
@@ -38,10 +61,12 @@ export default function Register() {
 
     setLoading(true);
     try {
-      await register(email, password, name);
+      await register(email.trim().toLowerCase(), password, name);
       navigate("/dashboard");
     } catch (err) {
-      setError(err.message || "Registration failed");
+      const { code, message } = getRegisterError(err);
+      setError(message);
+      setAlreadyExists(code === "auth/email-already-in-use");
     } finally {
       setLoading(false);
     }
@@ -123,7 +148,17 @@ export default function Register() {
         >
           <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
             {error && (
-              <Alert severity="error" variant="standard">
+              <Alert
+                severity="error"
+                variant="standard"
+                action={
+                  alreadyExists ? (
+                    <Link to="/login" style={{ color: "#f43f5e", fontWeight: 600, textDecoration: "none" }}>
+                      Sign in
+                    </Link>
+                  ) : null
+                }
+              >
                 {error}
               </Alert>
             )}

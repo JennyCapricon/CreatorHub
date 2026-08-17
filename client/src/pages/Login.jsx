@@ -10,6 +10,26 @@ import { Email, Lock, Visibility, VisibilityOff, Login as LoginIcon, LightMode, 
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+const getLoginError = (err) => {
+  const code = err?.code || "";
+  switch (code) {
+    case "auth/invalid-credential":
+    case "auth/wrong-password":
+    case "auth/user-not-found":
+    case "auth/invalid-login-credentials":
+      return "Incorrect email or password. Please try again, or use \"Forgot password?\" to reset it.";
+    case "auth/invalid-email":
+    case "auth/missing-email":
+      return "Please enter a valid email address.";
+    case "auth/network-request-failed":
+      return "Network error. Check your connection and try again.";
+    case "auth/too-many-requests":
+      return "Too many attempts. Please wait a moment and try again.";
+    default:
+      return "Sign in failed. Please try again.";
+  }
+};
+
 const getResetError = (err) => {
   const code = err?.code || "";
   switch (code) {
@@ -55,10 +75,10 @@ export default function Login() {
 
     setLoading(true);
     try {
-      await login(email, password);
+      await login(email.trim().toLowerCase(), password);
       navigate("/dashboard");
     } catch (err) {
-      setError(err.message || "Invalid credentials");
+      setError(getLoginError(err));
     } finally {
       setLoading(false);
     }
