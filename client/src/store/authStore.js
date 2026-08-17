@@ -4,6 +4,8 @@ import {
   signInWithEmailAndPassword,
   signOut,
   sendPasswordResetEmail,
+  verifyPasswordResetCode,
+  confirmPasswordReset,
   onAuthStateChanged,
 } from "firebase/auth";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
@@ -88,7 +90,17 @@ const useAuthStore = create((set) => ({
   },
 
   resetPassword: async (email) => {
-    await sendPasswordResetEmail(auth, email);
+    await sendPasswordResetEmail(auth, email, {
+      url: `${window.location.origin}/reset-password`,
+    });
+  },
+
+  verifyResetCode: async (oobCode) => {
+    return verifyPasswordResetCode(auth, oobCode);
+  },
+
+  confirmReset: async (oobCode, newPassword) => {
+    await confirmPasswordReset(auth, oobCode, newPassword);
   },
 
   updateUser: (userData) => set({ user: userData }),
